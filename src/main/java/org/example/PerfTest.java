@@ -15,11 +15,14 @@ public class PerfTest {
     @Option(name="-p", aliases="--patFile", required=true, usage="Specify the pattern string file, each pattern is in every single line.")
     private String inputPatternFile;
 
-    @Option(name="-i", aliases="--iterations", usage="Specify the iterations. Default is 1000")
-    private int iterations = 1000;
+    @Option(name="-i", aliases="--iterations", usage="Specify the iterations. Default is 10")
+    private int iterations = 10;
 
     @Option(name="-c", aliases="--compareResult", usage="Verfiy the different implementation of UDF")
     private boolean compareResult;
+
+    @Option(name="-t", aliases="--threads", usage="Specify the thread number, default is 4")
+    private int threads = 4;
 
     private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
@@ -72,15 +75,16 @@ public class PerfTest {
         assert (patterns != null);
         assert (values != null);
 
-        PerfEntry pe = new PerfEntry(patterns, values);
-
         if (inst.compareResult) {
-            if (pe.compareResults()) {
+            Validate v = new Validate(patterns, values);
+            if (v.compareResults()) {
                 System.out.println("Results are equal for two SOJ implements: " + JdkSojNvlImpl.class.getName() + " " + Re2JNvlImpl.class.getName());
             }
         } else {
-            pe.runPerf(new JdkSojNvlImpl());
-            pe.runPerf(new Re2JNvlImpl());
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads, new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+            mtsJdk.RunAll();
+            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads, new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
+            re2j.RunAll();
         }
     }
 }
