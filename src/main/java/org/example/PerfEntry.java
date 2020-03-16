@@ -1,7 +1,13 @@
 package org.example;
 
+
+import static java.lang.Integer.min;
+
 public class PerfEntry {
-    public static String VALUES[] =
+    private int _warmup_iters = 10;
+    private int _total_iters = 20000;
+
+    public String VALUES[] =
             {
             "nqc=CQAAAAAAAUCAAABAAAACAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAACBQABAEAAAAAAAAAAAAAAAQA**&c=1&g=0009819716c0aadcc1338426d2221188&h=97&px=4249&chnl=9&n=0009819716c0aadcc1338426d2221185&uc=1&es=0&nqt=CQAAAAAAAUSAAABAAAACAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwBACBUABAEAAAAAAAAAAAAAAAQA**&p=2317508&uaid=99e03fca1700a1286e973ca6eac98b93S0&bs=0&bu=756640741&t=0&u=756640741&cflgs=QA**&ul=en-US&plmt=lBIAAB%252BLCAAAAAAAAAC1mF1z2zYWhv%252BKhtewhG8SvrPbtM1Op%252FWum%252Bx0m15QJGWxlkSOKFlxM%252Fnv%252BxzIjpPM7Exu1jOwCRwABB%252B85%252BDAH4rxrri0rtI6lKoY%252B%252BLyjw9F3xaXRuvSRFU0NFltSm1MZYKJjm572opV51Y%252BVtYvl6VvtE8%252Bxjp2ne4619i6LlTRHZjO2qCr8Ce1%252Bjw5g3fHzUYVw7lhZLL143LPW3kdFeO84fGA4UNRi%252Fm2qXdtvRF7LXMyW8O6C611qkxioY2u67ZpjHOVt7G11rLewIBtK19T6OQrV3ptfGA5JgZngquuPv3Q8zjJu%252BXNxy1PTh7%252B5sFXldVUhoPYeVg9yPcb6xOV6VxxKZUyYnX63Hb60rbMVWOdFWOuRVNmy%252FCFZXixTN3LfKtp%252BGzyc%252BV58s39ier7Vb%252FrD4%252Bz1aae1rP7en8QZpmArHwrn%252Fhm6q%252FDD8v61%252Bvf19d%252FPZQ3%252B%252F1uKwB2Al8WMMjDq99%252FWLfT8jDd62H48fX9L9Pbn3cnrHuZzWpdaWcrWdX2mduUHy%252BSLK%252BXOSIP4z535%252Bn9%252BPy0%252B%252FR0%252FDYlbZbnl5p0oeOFkUVupi%252BaZK%252BXS1rkoc0mwTLJpt3s%252B4f60El1zAR297vhtBM0VpbpZcxxg7CKKqIoaskmI6s3Nvoo5iqUXjYkoR751mRC9PlvytthtIkZRyqDPhtKLTMkp73U0WOVd8qYEKp0fkBaMnfJ5PI32WCf5oznd8Wq%252BPPJkfjbjwJOZ7zN%252Funxrh33b6bu8%252Bp3w27qdvLp17%252F233c39vz7Ol1dX7365bt%252FX4jkd%252FHq%252Bu7qu%252Bub09XTsF%252BXfzHkw7ui2Y6v23cEARtUrr3t9lM%252F7KRJGobhvu%252B%252BbsuvvG32XSdt7woz13P9rnix%252FVzv7o71XZet0gnTtn7%252Fttu1wz6%252FL7qKtqnbdM2ha2%252BO%252B3GYutfthOkPo6xyyitCyUuX57Ff9IiqVJVKymhljDJWGaeMVyYoApoplamUScpqZRlhlXXKesWX2qhsqWylbFJOK2eUY0KnnFcuKBcVsY8FuqS8Vt4ob5XnfV75oHxUvlS%252BUj6poFUwKlgVnApBhaiIraFSIamoVTQqWhWdiqw0qBhVLFWsVEyq1Ko0qrSqdKr0qgyq5FtKVVaqTKrSqjKqsqpyqvKqCqqKquJTK1UllbRKRiWrklPJqxRUKlXiSzUUNBg0HDQUNBi0tAMoE8ImjASSUBJMQghEBkYGQkQcJVLAGSgAhJEBkoGSAZNxwpjxkDJwMoAykCI4AZ4%252BwDLQMl42gj4AM%252BAy8DIAMxDjbKHQB2gmyG7RB3QGdvgJhX7gM%252FDD0yj0AyGhnEIfEBoY4nUU%252BsDQANFA0cDQANFA0YDRANFA0YCRU4KCDYYGiAaEBoa4IAVbYg2gNMIyiWzQDTwtPK1GOvC0GuXA1MLUGtEVdphamFqYWphatGcRn4WtzcLDJroT4YnyRHqiPbhauFq4chxQ6IP8LFwtXDmrKfSBq4Wrhav1ImH6wdWiRAtXDgk0TR%252B4ElUo9Amic%252FrA1cLVwtXC1cLVwtXC1cKVmEcRh6AfXC1cLVwt0rRwtXC1cLWleAzzwNbC1sLWolELXwtbC1tbiUthh6%252BFL3GVgg22Fq42ib%252BJw%252BFuMHUwJWJS8DQjXkg7LB0cObMp%252BCEcnRE749Cos%252BKqjIOlgyXnEgWbeLG4sTixeLG4sfixOLJ4MhwdHMk3KOLo9IGhg6FDnw6GDoYOhi5IFKANZg5mDmYOZg5mLkp4YAysHKwc%252BnNwIuGgYCsldjAWTqRaFOwwIlehYK8ksIiNsTByaNDByMHIwcjByKM7Dx8PHw8fj%252B68JuRosRGSjMQk7GjOw8nDycPIWwlUtMPHozcPIzIkCmOt2BkLJw8nDyMPIw8jDx8voU5inUS6HOqwS5iTOAcbDxuPtnyQGMg42HjYeLh4uHh0xOlJYT58lEOegh0%252BHj4ePh4%252BvpToiQ0Nefh42HjYeAKcrySsYoONh41HPx4%252BHh8lU6AwHh%252F1cPLCKUkAJgKjpwCvAKeAfwZYkflRsKOpAKsAq4CuArxIbSn0gVlAVwFdBSthnH6wC7ALsAtwC3ALcAtwI5GkYINbgFtAWwFuAW4BXQXYBdgF2AW0FdBWgGGAYZDDQk4LOS7yYUEfOS5gGNBXiHJ60A9mAf8LcAv4INkCRY4V5oFbgFlAUwFmAV4BTgFOAU4BTgE%252BIUm7HEJyCnEGwSaiowibCJsIG3Ifjic5orDBJcKFNJSCDSYRJtHK%252BcXpBY8Ij4iWIkxIfjjUsMODY1wO6Yd8OP%252FcT4fPUgU%252Bl4Rg35GPtTkReEnqfrP60ttLrecxuf%252Fk9IA09vBmbL%252Bh80dJNTfbwznXzZcXWupG8rvuvaTB04bnP9CeCNVndYtbiL%252BV4pRRPDqI24n2nc7BSqJpkiShlDhbSgCNEr2ihHPZUyubYcVjiMgSxlOO4fkQkV%252BCR7CIrCqRo8%252Byl3CSw6SkJEbckhPoz498Q771TP3fnfxdd%252F3dmjxOInlx6tvDurh0WtNv1x1Ow%252F7%252BtXwueyEpat2%252BIfnPLd2yfpzLr%252BM0Xw%252FbbiTtmjfNelzIL8lfx%252FFb70Xjcbnpp%252FVvjyNLsry5Hu%252F73c1XrdP5ivaP27z8p8r0tPGSjc%252FNXHLc4548u1gs%252Bn1e33SoD30zb4btotkvHhaNWUzN4vZ5sos8bL7td%252FO%252FpoLPFjBTvjb%252BLzSSJk%252Bvr1jHYX%252FsGFFvu1tG%252Fatb7btp%252Fdzc79723enrxunH29tXu3q56drntm73wILH%252FdAem4N8CzfTvrmXlPxbbi4TX3KVN%252BabtmXqD53soP4oH1LLFTGwM2cxPzzfnLe9JN3F9j0dz9c1avWUa%252FWQa3I7YiO6et%252Bs%252F3ns9o%252FMJACHlVwlZPLmkDs2%252BW3qs1t%252F9dmtnzSHW6kmWJxv%252FctQhxU5waquiWpmVSP%252FJjVEl7IMdZe%252B4dY%252F5oauGbksunLOkmViWw%252BnddoK3fOy8sds75%252B9Wa5WskKZ6%252Fg810Guj%252BvDYZwuF4vT6ZTZZjG1Xb2ZFgJNuH8vtdm2brtZV0%252BPs3qzmT2CZrYZdnfzQmhMnxY47j6NuJi9uZ39NBynbnbVUvvpZna7GQ4zM6un2bCaGbuwbiFBqRANPktGvkx2Il%252B8OYz48XJ%252BF8340hITUbcYpOH83k1%252FeKk0R7nPvbn9Xm7tS2nXQqp5eHq4H7OgmrEpPgmlqio26v8sFOrL%252FGotl81G%252FgeRUqfdyohcdF2TrHOuLn3ZrVY0hlL%252BrTOKoIp2aZs2xuoiNL65MKarL5aNTRelb5ctiXnTLF3x8b9OpeN4lBIAAA%253D%253D&!xt=225085&ec=1&pn=2&rq=99e03f101700aa158513b47efff1057d&po=%5B%28pg%3A2380057+pid%3A100716%29%28pg%3A2380057+pid%3A100718%29%5D&trunc=true&ciid=4D%2FKhuk*",
             "scrv=2176x1224&flgs=AA**&efam=BOLTSELL&tiZone=5&sampRate=100&g=0009819716c0aadcc1338426d2221188&h=97&scrColDep=24&steSpd=2&cp=2491901&n=0009819716c0aadcc1338426d2221185&p=2208336&uaid=999e911d1700a99bc7b6c34cfd95e498S0&dsktop=true&t=0&u=756640741&plsUBT=1&cflgs=AA**&eactn=VIEW&seqid=2319156784429&rq=a4fc21ee234a3fa1&ciid=npEovHs*",
@@ -34,12 +40,21 @@ public class PerfEntry {
             "uit=1581987260447&nqc=CgAAAAAAQAAAAACAAAgAEAAAAABAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEA**&rdt=1&c=58&g=86fa95351610aca44692c91bffc0c8de&h=35&js=1&n=86faa0471610aa46c407f32bfcef8af9&uc=15&es=15&nqt=CgAAAAAAQAAAAACAAAgAEAAAAABAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAEAAAAAAAAAAAABAAEA**&p=279&bs=15&r=-957749112&t=15&regU=1&u=217578196&ul=en-AU&hrc=301&vr=117942&ec=1&pn=2&siid=y9kfqpA*&sid=p2047675.l2560&ciid=y%2BdgXWM*",
             "uit=1572614412515&nqc=AAAAAAAAQAAAAIAAAAAABAAAAACBAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAgBCEgQAQ&rdt=1&c=192&g=814296a116c0add565d34596fffbd04c&h=a1&js=1&n=8146f39b16c0abc0056214d2f47370d6&uc=77&es=77&nqt=AAAAAAAAQAAAAIAAAAAABAAAAACBAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQQkBCEgQAQ&p=279&bs=77&t=77&regU=1&u=40693845&ul=de-DE&hrc=301&vo=117943&vr=117942&ec=1&pn=2&siid=SjllVqs*&sid=p2046732&ciid=Sl8kQss*"
             };
-    public static String KEYS[] =
+    public String KEYS[] =
             {
                     "pageci", "rq"
             };
 
-    public static void Perf1Core(ISojNvl sojNvl) {
+    public PerfEntry() {
+
+    }
+
+    public PerfEntry(String patterns[], String values[]) {
+        KEYS = patterns;
+        VALUES = values;
+    }
+
+    public void perf1Core(ISojNvl sojNvl) {
         for (int k = 0; k < KEYS.length; k++)
         {
             for (int j = 0 ; j < VALUES.length; j++)
@@ -49,30 +64,58 @@ public class PerfEntry {
         }
     }
 
-    public static void Warmup(ISojNvl sojNvl) {
+    public boolean compareResults() {
+        ISojNvl jdkSojNvl = new JdkSojNvlImpl();
+        ISojNvl re2jSojNvl = new Re2JNvlImpl();
+        for (int k = 0; k < KEYS.length; k++)
+        {
+            for (int j = 0 ; j < VALUES.length; j++)
+            {
+                String ref = jdkSojNvl.getTagValue(VALUES[j], KEYS[k]);
+                String res = re2jSojNvl.getTagValue(VALUES[j], KEYS[k]);
+                if ((ref == null && res != null) ||
+                    (ref != null && !ref.equals(res))) {
+                    System.out.println("Failed at pat: " + KEYS[k] + " value: " + VALUES[j]);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void warmup(ISojNvl sojNvl) {
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++) {
-            Perf1Core(sojNvl);
+        for (int i = 0; i < _warmup_iters; i++) {
+            perf1Core(sojNvl);
         }
         long end = System.currentTimeMillis();
         long dur = end - start;
         System.out.println(sojNvl.ToString() + " warm up takes " + dur + " ms");
     }
 
-    public static void Perf(ISojNvl sojNvl) {
-        Warmup(sojNvl);
+    public void runPerf(ISojNvl sojNvl) {
+        warmup(sojNvl);
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 20000; i++)
+        for (int i = 0; i < _total_iters; i++)
         {
-            Perf1Core(sojNvl);
+            perf1Core(sojNvl);
         }
         long end = System.currentTimeMillis();
         long dur = end - start;
         System.out.println(sojNvl.ToString() + " takes " + dur + " ms");
     }
 
+    public void runJdkSoj() {
+        runPerf(new JdkSojNvlImpl());
+    }
+
+    public void runRe2jSoj() {
+        runPerf(new Re2JNvlImpl());
+    }
+
     public static void main(String args[]) {
-        Perf(new JdkSojNvlImpl());
-        Perf(new Re2JNvlImpl());
+        PerfEntry perfEntry = new PerfEntry();
+        perfEntry.runJdkSoj();
+        perfEntry.runRe2jSoj();
     }
 }
