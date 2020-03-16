@@ -15,21 +15,26 @@ public class PerfTest {
     @Option(name="-p", aliases="--patFile", required=true, usage="Specify the pattern string file, each pattern is in every single line.")
     private String inputPatternFile;
 
-    @Option(name="-c", aliases="--compareResult", usage="")
+    @Option(name="-i", aliases="--iterations", usage="Specify the iterations. Default is 1000")
+    private int iterations = 1000;
+
+    @Option(name="-c", aliases="--compareResult", usage="Verfiy the different implementation of UDF")
     private boolean compareResult;
 
-    private void parseArgs(final String[] args) {
+    private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
         if (args.length < 1) {
             parser.printUsage(System.out);
             System.exit(-1);
         }
-
+        boolean ret = true;
         try {
             parser.parseArgument(args);
         } catch (CmdLineException clEx) {
             System.out.println("Error: failed to parse command-line opts: " + clEx);
+            ret = false;
         }
+        return ret;
     }
 
     private String[] readInputLines(String inputFileLines) {
@@ -58,7 +63,9 @@ public class PerfTest {
 
     public static void main(final String args[]) {
         final PerfTest inst = new PerfTest();
-        inst.parseArgs(args);
+        if (!inst.parseArgs(args)) {
+            return;
+        }
 
         String[] patterns = inst.readInputLines(inst.inputPatternFile);
         String[] values = inst.readInputLines(inst.inputStringFile);
@@ -66,9 +73,10 @@ public class PerfTest {
         assert (values != null);
 
         PerfEntry pe = new PerfEntry(patterns, values);
+
         if (inst.compareResult) {
             if (pe.compareResults()) {
-                System.out.println("Results are equal for two SOJ implements");
+                System.out.println("Results are equal for two SOJ implements: " + JdkSojNvlImpl.class.getName() + " " + Re2JNvlImpl.class.getName());
             }
         } else {
             pe.runPerf(new JdkSojNvlImpl());

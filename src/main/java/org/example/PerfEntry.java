@@ -5,7 +5,7 @@ import static java.lang.Integer.min;
 
 public class PerfEntry {
     private int _warmup_iters = 10;
-    private int _total_iters = 20000;
+    private int _total_iters = 1000;
 
     public String VALUES[] =
             {
@@ -49,9 +49,22 @@ public class PerfEntry {
 
     }
 
+    public PerfEntry(int iter, int warm) {
+        _total_iters = iter;
+        _warmup_iters = warm;
+    }
+
     public PerfEntry(String patterns[], String values[]) {
         KEYS = patterns;
         VALUES = values;
+    }
+
+    public void setTotalIters(int iters) {
+        _total_iters = iters;
+    }
+
+    public void setWarmIters(int warms) {
+        _warmup_iters = warms;
     }
 
     public void perf1Core(ISojNvl sojNvl) {
