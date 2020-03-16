@@ -4,3 +4,13 @@ pageci
 ansdomain
 eactn
 pagedtl
+sgnTabClick
+sgnStatus
+authMethod
+uid
+sgnFastFYPReset
+type
+sgnChannelType
+sQr
+gf
+es

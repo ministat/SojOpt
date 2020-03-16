@@ -1,6 +1,5 @@
 package org.example;
 
-
 import static java.lang.Integer.min;
 
 public class PerfEntry {
