@@ -41,7 +41,7 @@ Overall throughput: 1.69493E8 bytes/s
 Overall duration: 12714(ms) total strings 2154941440 bytes
 ```
 
-The throughput of Re2 is about 2X~4X of JDK regex.
+The throughput of Re2 is about ~2X of JDK regex.
 
 Note:
 JdkSojNvlImpl is the JDK regex, Re2JNvlImpl is google's Re2J.
