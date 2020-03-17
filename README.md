@@ -1,3 +1,13 @@
+This repo demonstrates the Re2J benefit for SojNvl:
+
+The following table shows the performance benefit for different input: 1k.txt, 2k.txt, 4k.txt, and 8k.txt. The acceleration is ~2X. It is collected with 4 threads.
+
+|ThroughPut(bytes/s)|1k|2k|4k|8k|
+|-------------------|--|--|--|--|
+|JDK regex |48.46|53.72|52.3|53.08|
+|Re2J regex|129  |128.6|133 |129.6|
+|Acce%     |2.66 |2.39 |2.54|2.44 |
+
 Build:
 ```
 mvn clean package

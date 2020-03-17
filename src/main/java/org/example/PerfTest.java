@@ -24,6 +24,12 @@ public class PerfTest {
     @Option(name="-t", aliases="--threads", usage="Specify the thread number, default is 4")
     private int threads = 4;
 
+    @Option(name="-r", aliases="--re2j", usage="Only run regex through Re2j")
+    private boolean onlyRe2j = false;
+
+    @Option(name="-j", aliases="--jdk", usage="Only run regex through JDK")
+    private boolean onlyJDK = false;
+
     private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
         if (args.length < 1) {
@@ -75,15 +81,29 @@ public class PerfTest {
         assert (patterns != null);
         assert (values != null);
 
+        if (inst.onlyJDK && inst.onlyRe2j) {
+            System.out.println("onlyJDK and onlyRe2j are exclusive, you cannot run them together");
+            System.exit(1);
+        }
         if (inst.compareResult) {
             Validate v = new Validate(patterns, values);
             if (v.compareResults()) {
                 System.out.println("Results are equal for two SOJ implements: " + JdkSojNvlImpl.class.getName() + " " + Re2JNvlImpl.class.getName());
             }
+        } else if (inst.onlyJDK) {
+                MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                        new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+                mtsJdk.RunAll();
+        } else if (inst.onlyRe2j) {
+            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
+            re2j.RunAll();
         } else {
-            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads, new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
             mtsJdk.RunAll();
-            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads, new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
+            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
             re2j.RunAll();
         }
     }
