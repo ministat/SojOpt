@@ -62,7 +62,7 @@ public class MultipleThreadingSoj {
             }
         }
         System.out.println("Overall throughput: " + (double)(totalSz / totalDur) * 1000 + " bytes/s");
-        System.out.println("Overall duration: " + totalDur + " total strings " + totalSz);
+        System.out.println("Overall duration: " + totalDur + "(ms) total strings " + totalSz + " bytes");
     }
 }
 

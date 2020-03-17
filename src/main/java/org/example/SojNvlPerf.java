@@ -53,7 +53,7 @@ public class SojNvlPerf extends PerfResource implements IPerfEntry {
         }
         long end = System.currentTimeMillis();
         long dur = end - start;
-        System.out.println(_sojNvl.ToString() + " warm up takes " + dur + " ms");
+        System.out.println(_sojNvl.ToString() + " warm up takes " + dur + " (ms)");
         return sz;
     }
 }
