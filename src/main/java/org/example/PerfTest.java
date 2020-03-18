@@ -88,7 +88,10 @@ public class PerfTest {
         if (inst.compareResult) {
             Validate v = new Validate(patterns, values);
             if (v.compareResults()) {
-                System.out.println("Results are equal for two SOJ implements: " + JdkSojNvlImpl.class.getName() + " " + Re2JNvlImpl.class.getName());
+                System.out.println("Results are equal for three SOJ implements: " +
+                        JdkSojNvlImpl.class.getName() + " " +
+                        Re2JNvlImpl.class.getName() + " " +
+                        FastSojNvlImpl.class.getName());
             }
         } else if (inst.onlyJDK) {
                 MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
@@ -105,6 +108,9 @@ public class PerfTest {
             MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
                     new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
             re2j.RunAll();
+            MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new FastSojNvlImpl(), patterns, values, inst.iterations));
+            fastSoj.RunAll();
         }
     }
 }
