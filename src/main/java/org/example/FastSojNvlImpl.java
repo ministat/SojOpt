@@ -1,6 +1,15 @@
 package org.example;
 
 public class FastSojNvlImpl implements ISojNvl {
+    private long _startWithMatched = 0;
+    private long _indexOfMatched = 0;
+
+    public long startWithMatched() {
+        return _startWithMatched;
+    }
+    public long indexOfMatched() {
+        return _indexOfMatched;
+    }
     @Override
     public String getTagValue(String querystring, String param) {
         if (querystring == null || param == null || param.length() == 0) {
@@ -16,6 +25,7 @@ public class FastSojNvlImpl implements ISojNvl {
             } else {
                 v = querystring.substring(l + 1);
             }
+            _startWithMatched++;
         }
 
         if (v == null) {
@@ -26,6 +36,7 @@ public class FastSojNvlImpl implements ISojNvl {
                 } else {
                     v = querystring.substring(l + 2);
                 }
+                _startWithMatched++;
             }
         }
 
@@ -39,6 +50,7 @@ public class FastSojNvlImpl implements ISojNvl {
                 } else {
                     v = querystring.substring(begin2);
                 }
+                _indexOfMatched++;
             }
         }
 
@@ -62,6 +74,7 @@ public class FastSojNvlImpl implements ISojNvl {
                     v = querystring.substring(begin2);
                 }
             }
+            _indexOfMatched++;
         }
 
         if (v != null && v.length() == 0) {

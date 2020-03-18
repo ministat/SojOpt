@@ -30,6 +30,9 @@ public class PerfTest {
     @Option(name="-j", aliases="--jdk", usage="Only run regex through JDK")
     private boolean onlyJDK = false;
 
+    @Option(name="-f", aliases="--fastnvl", usage="Only run fast NVL")
+    private boolean onlyFast = false;
+
     private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
         if (args.length < 1) {
@@ -81,8 +84,8 @@ public class PerfTest {
         assert (patterns != null);
         assert (values != null);
 
-        if (inst.onlyJDK && inst.onlyRe2j) {
-            System.out.println("onlyJDK and onlyRe2j are exclusive, you cannot run them together");
+        if (inst.onlyJDK && inst.onlyRe2j && inst.onlyFast) {
+            System.out.println("onlyJDK, onlyRe2j and onlyFast are exclusive, you cannot run them together");
             System.exit(1);
         }
         if (inst.compareResult) {
@@ -101,16 +104,22 @@ public class PerfTest {
             MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
                     new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
             re2j.RunAll();
-        } else {
-            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
-            mtsJdk.RunAll();
-            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
-            re2j.RunAll();
+        } else if (inst.onlyFast) {
+            FastSojNvlImpl fast = new FastSojNvlImpl();
             MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new FastSojNvlImpl(), patterns, values, inst.iterations));
+                    new SojNvlPerf(fast, patterns, values, inst.iterations));
             fastSoj.RunAll();
+            System.out.println("StartsWith: " + fast.startWithMatched() + " IndexOf: " + fast.indexOfMatched());
+        } else {
+                MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                        new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+                mtsJdk.RunAll();
+                MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
+                        new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
+                re2j.RunAll();
+                MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
+                        new SojNvlPerf(new FastSojNvlImpl(), patterns, values, inst.iterations));
+                fastSoj.RunAll();
         }
     }
 }
