@@ -1,12 +1,24 @@
-This repo demonstrates the Re2J benefit for SojNvl:
+This repo demonstrates the FastNvl, Re2J benefit for SojNvl:
 
-The following table shows the performance benefit for different input: 1k.txt, 2k.txt, 4k.txt, and 8k.txt. The acceleration is ~2X. It is collected with 4 threads.
+The following table shows the performance benefit for different input: 1k.txt, 2k.txt, 4k.txt, 8k.txt, 16k.txt and 32k.txt The acceleration is 8X~22X. It is collected with 4 threads.
 
-|ThroughPut(bytes/s)|1k|2k|4k|8k|
-|-------------------|--|--|--|--|
-|JDK regex |48.46|53.72|52.3|53.08|
-|Re2J regex|129  |128.6|133 |129.6|
-|Acce%     |2.66 |2.39 |2.54|2.44 |
+For long input strings (ubi table)
+
+|ThroughPut(MB/s)|1k|2k|4k|8k|16k|32k|
+|----------------|--|--|--|--|---|---|
+|JDK regex       |50|53|52|52|52 |52 |
+|Re2J regex     |165|164|152|140|128|126|
+|Fast Nvl  |1116|1099|1089|1027|1022|984|
+|Fast/JDK        |22|21|21|20|20|19|
+
+For short input strings (access views table)
+
+|ThroughPut(MB/s)|1k|2k|4k|8k|16k|32k|
+|----------------|--|--|--|--|---|---|
+|JDK regex       |27|33|32|20|31 |35 |
+|Re2J regex     |22|18|12|24|22|17|
+|Fast Nvl  |296|253|320|330|249|273|
+|Fast/JDK        |11|8|10|17|8|8|
 
 Build:
 ```
@@ -17,9 +29,9 @@ Run:
 
 ```
 cd data
-tar zxvf 8k.tgz
+tar zxvf long_32k.tgz
 cd ..
-java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -p data/pat.txt -s data/8k.txt
+java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -p data/pat.txt -s data/32k.txt
 ```
 
 The sample output:
