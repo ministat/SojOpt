@@ -33,6 +33,9 @@ public class PerfTest {
     @Option(name="-f", aliases="--fastnvl", usage="Only run fast NVL")
     private boolean onlyFast = false;
 
+    @Option(name="-d", aliases="--dummyindexof", usage="Dummy test for indexOf")
+    private boolean dummyIndexOf = false;
+
     private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
         if (args.length < 1) {
@@ -97,9 +100,9 @@ public class PerfTest {
                         FastSojNvlImpl.class.getName());
             }
         } else if (inst.onlyJDK) {
-                MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
-                        new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
-                mtsJdk.RunAll();
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+            mtsJdk.RunAll();
         } else if (inst.onlyRe2j) {
             MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
                     new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
@@ -110,16 +113,21 @@ public class PerfTest {
                     new SojNvlPerf(fast, patterns, values, inst.iterations));
             fastSoj.RunAll();
             System.out.println("StartsWith: " + fast.startWithMatched() + " IndexOf: " + fast.indexOfMatched());
+        } else if (inst.dummyIndexOf) {
+            IndexOfImpl indexOf = new IndexOfImpl();
+            MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(indexOf, patterns, values, inst.iterations));
+            fastSoj.RunAll();
         } else {
-                MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
-                        new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
-                mtsJdk.RunAll();
-                MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
-                        new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
-                re2j.RunAll();
-                MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
-                        new SojNvlPerf(new FastSojNvlImpl(), patterns, values, inst.iterations));
-                fastSoj.RunAll();
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+            mtsJdk.RunAll();
+            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
+            re2j.RunAll();
+            MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new FastSojNvlImpl(), patterns, values, inst.iterations));
+            fastSoj.RunAll();
         }
     }
 }
