@@ -1,6 +1,8 @@
 package org.example;
 
-public class FastSojNvlImpl implements ISojNvl {
+import org.javatuples.Triplet;
+
+public class FastSojNvlImpl extends CachedSojNvlImpl {
     private long _startWithMatched = 0;
     private long _indexOfMatched = 0;
 
@@ -10,10 +12,25 @@ public class FastSojNvlImpl implements ISojNvl {
     public long indexOfMatched() {
         return _indexOfMatched;
     }
+
+    public FastSojNvlImpl() {
+        super(false);
+    }
+    public FastSojNvlImpl(boolean useCache) {
+        super(useCache);
+    }
+
     @Override
     public String getTagValue(String querystring, String param) {
         if (querystring == null || param == null || param.length() == 0) {
             return null;
+        }
+
+        if (_useCache && _cache.get() != null) {
+            Triplet<String, String, String> cache = _cache.get();
+            if (cache.getValue0().equals(querystring) && cache.getValue1().equals(param)) {
+                return cache.getValue2();
+            }
         }
 
         String v = null;
@@ -77,10 +94,17 @@ public class FastSojNvlImpl implements ISojNvl {
             _indexOfMatched++;
         }
 
+        String ret = null;
         if (v != null && v.length() == 0) {
-            return null;
+            ret = null;
+        } else {
+            ret = v;
         }
-        return v;
+        if (_useCache) {
+            Triplet<String, String, String> triplet = new Triplet<String, String, String>(querystring, param, ret);
+            _cache.set(triplet);
+        }
+        return ret;
     }
 
     @Override

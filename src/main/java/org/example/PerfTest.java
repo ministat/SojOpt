@@ -18,7 +18,7 @@ public class PerfTest {
     @Option(name="-i", aliases="--iterations", usage="Specify the iterations. Default is 10")
     private int iterations = 10;
 
-    @Option(name="-c", aliases="--compareResult", usage="Verfiy the different implementation of UDF")
+    @Option(name="-c", aliases="--compareResult", usage="Verify the different implementation of UDF")
     private boolean compareResult;
 
     @Option(name="-t", aliases="--threads", usage="Specify the thread number, default is 4")
@@ -35,6 +35,9 @@ public class PerfTest {
 
     @Option(name="-d", aliases="--dummyindexof", usage="Dummy test for indexOf")
     private boolean dummyIndexOf = false;
+
+    @Option(name="-a", aliases="--usecache", usage="Use cache to accelerate process")
+    private boolean useCache = false;
 
     private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
@@ -82,6 +85,7 @@ public class PerfTest {
             return;
         }
 
+        boolean useCache = inst.useCache;
         String[] patterns = inst.readInputLines(inst.inputPatternFile);
         String[] values = inst.readInputLines(inst.inputStringFile);
         assert (patterns != null);
@@ -101,14 +105,14 @@ public class PerfTest {
             }
         } else if (inst.onlyJDK) {
             MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+                    new SojNvlPerf(new JdkSojNvlImpl(useCache), patterns, values, inst.iterations));
             mtsJdk.RunAll();
         } else if (inst.onlyRe2j) {
             MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
+                    new SojNvlPerf(new Re2JNvlImpl(useCache), patterns, values, inst.iterations));
             re2j.RunAll();
         } else if (inst.onlyFast) {
-            FastSojNvlImpl fast = new FastSojNvlImpl();
+            FastSojNvlImpl fast = new FastSojNvlImpl(useCache);
             MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
                     new SojNvlPerf(fast, patterns, values, inst.iterations));
             fastSoj.RunAll();
@@ -119,14 +123,19 @@ public class PerfTest {
                     new SojNvlPerf(indexOf, patterns, values, inst.iterations));
             fastSoj.RunAll();
         } else {
-            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new JdkSojNvlImpl(), patterns, values, inst.iterations));
+            SojNvlPerf jdk = new SojNvlPerf(new JdkSojNvlImpl(useCache), patterns, values, inst.iterations);
+            jdk.setRepeated(useCache ? 10 : 1);
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads, jdk);
             mtsJdk.RunAll();
-            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new Re2JNvlImpl(), patterns, values, inst.iterations));
+
+            SojNvlPerf re2 = new SojNvlPerf(new Re2JNvlImpl(useCache), patterns, values, inst.iterations);
+            re2.setRepeated(useCache ? 10 : 1);
+            MultipleThreadingSoj re2j = new MultipleThreadingSoj(inst.threads, re2);
             re2j.RunAll();
-            MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads,
-                    new SojNvlPerf(new FastSojNvlImpl(), patterns, values, inst.iterations));
+
+            SojNvlPerf fast = new SojNvlPerf(new FastSojNvlImpl(useCache), patterns, values, inst.iterations);
+            fast.setRepeated(useCache ? 10 : 1);
+            MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads, fast);
             fastSoj.RunAll();
         }
     }

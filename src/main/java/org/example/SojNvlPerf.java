@@ -4,6 +4,7 @@ public class SojNvlPerf extends PerfResource implements IPerfEntry {
     public ISojNvl _sojNvl;
     public int _warmup_iters = 10;
     public int _total_iters = 1000;
+    public int _repeated = 1;
 
     public SojNvlPerf(ISojNvl sojNvl, String patterns[], String values[], int totalIters) {
         _sojNvl = sojNvl;
@@ -12,14 +13,21 @@ public class SojNvlPerf extends PerfResource implements IPerfEntry {
         _total_iters = totalIters;
     }
 
+    // repeat the same string for @r times
+    public void setRepeated(int r) {
+        _repeated = r;
+    }
+
     private long runPerfCoreRange(int startIdx, int endIdx) {
         long sz = 0;
         for (int k = 0; k < KEYS.length; k++)
         {
             for (int j = startIdx ; j <= endIdx; j++)
             {
-                _sojNvl.getTagValue(VALUES[j], KEYS[k]);
-                sz += VALUES[j].length();
+                for (int r = 0; r < _repeated; r++) {
+                    _sojNvl.getTagValue(VALUES[j], KEYS[k]);
+                    sz += VALUES[j].length();
+                }
             }
         }
         return sz;
