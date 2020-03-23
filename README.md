@@ -20,6 +20,15 @@ For short input strings (access views table)
 |Fast Nvl  |296|253|320|330|249|273|
 |Fast/JDK        |11|8|10|17|8|8|
 
+Another finding is no benefit if using local cache:
+
+The Fast Nvl acceleration is not significant when applying cache.
+
+|Acceleration|Long32k|Short32k|
+|------------|-------|--------|
+|Cached      |15.64|2.64|
+|NoCache     |18.92|7.8|
+
 Build:
 ```
 mvn clean package
