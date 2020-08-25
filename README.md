@@ -1,4 +1,12 @@
-This repo demonstrates the FastNvl, Re2J benefit for SojNvl:
+# Summary
+This repo demonstrates the optimization of some soj udf:
+
+```SojNvl```
+```soj_parse_clientinfo```
+
+# Benchmark result
+
+## SojNvl
 
 The following table shows the performance benefit for different input: 1k.txt, 2k.txt, 4k.txt, 8k.txt, 16k.txt and 32k.txt The acceleration is 8X~22X. It is collected with 4 threads.
 
@@ -29,12 +37,7 @@ The Fast Nvl acceleration is not significant when applying cache.
 |Cached      |15.64|2.64|
 |NoCache     |18.92|7.8|
 
-Build:
-```
-mvn clean package
-```
-
-Run:
+### Run
 
 ```
 cd data
@@ -76,3 +79,57 @@ The throughput of Re2 is about ~2X of JDK regex.
 
 Note:
 JdkSojNvlImpl is the JDK regex, Re2JNvlImpl is google's Re2J.
+
+# soj_parse_clientinfo
+
+Improvement is about 4.7X
+
+|ThroughPut(MB/s)|10k|
+|----------------|--|
+|JDK regex       |1.54601E8|
+|AC              |6.51477E8|
+|ACWoCopy        |7.12955E8|
+
+
+## Run
+
+hongjizhang@hongjizhang-desktop:~/Work/OpenSource/SojOpt$ java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -s data/soj_parse_clientinfo_10k.txt -p data/soj_parse_clientinfo.pat -g
+org.example.OrigClientInfoParser warm up takes 1572 (ms)
+org.example.OrigClientInfoParser warm up takes 1572 (ms)
+org.example.OrigClientInfoParser warm up takes 1678 (ms)
+org.example.OrigClientInfoParser warm up takes 1727 (ms)
+
+========Printing the results of org.example.OrigClientInfoParser ======
+	0thd throughput: 1.49755E8 bytes/s
+	1thd throughput: 1.58731E8 bytes/s
+	2thd throughput: 1.59876E8 bytes/s
+	3thd throughput: 1.50588E8 bytes/s
+Overall throughput: 1.54601E8 bytes/s
+Overall duration: 6304(ms) total strings 974609920 bytes
+hongjizhang@hongjizhang-desktop:~/Work/OpenSource/SojOpt$ java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -s data/soj_parse_clientinfo_10k.txt -p data/soj_parse_clientinfo.pat -z
+org.example.OptClientInfoParser warm up takes 682 (ms)
+org.example.OptClientInfoParser warm up takes 685 (ms)
+org.example.OptClientInfoParser warm up takes 686 (ms)
+org.example.OptClientInfoParser warm up takes 713 (ms)
+
+========Printing the results of org.example.OptClientInfoParser ======
+	0thd throughput: 6.44583E8 bytes/s
+	1thd throughput: 6.56745E8 bytes/s
+	2thd throughput: 6.65717E8 bytes/s
+	3thd throughput: 6.39507E8 bytes/s
+Overall throughput: 6.51477E8 bytes/s
+Overall duration: 1496(ms) total strings 974609920 bytes
+hongjizhang@hongjizhang-desktop:~/Work/OpenSource/SojOpt$ java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -s data/soj_parse_clientinfo_10k.txt -p data/soj_parse_clientinfo.pat -x
+org.example.OptClientInfoParser warm up takes 611 (ms)
+org.example.OptClientInfoParser warm up takes 616 (ms)
+org.example.OptClientInfoParser warm up takes 619 (ms)
+org.example.OptClientInfoParser warm up takes 635 (ms)
+
+========Printing the results of org.example.OptClientInfoParser ======
+	0thd throughput: 7.10357E8 bytes/s
+	1thd throughput: 7.20865E8 bytes/s
+	2thd throughput: 7.2732E8 bytes/s
+	3thd throughput: 6.94166E8 bytes/s
+Overall throughput: 7.12955E8 bytes/s
+Overall duration: 1367(ms) total strings 974609920 bytes
+
