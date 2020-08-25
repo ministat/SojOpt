@@ -39,6 +39,18 @@ public class PerfTest {
     @Option(name="-a", aliases="--usecache", usage="Use cache to accelerate process")
     private boolean useCache = false;
 
+    @Option(name="-n", aliases="--nvl", usage="Nvl operations")
+    private boolean nvl = false;
+
+    @Option(name="-g", aliases="--origparser", usage="Original client info parser")
+    private boolean originClientParser = false;
+
+    @Option(name="-z", aliases="--optparser", usage="Optimized client info parser")
+    private boolean optClientParser = false;
+
+    @Option(name="-x", aliases="--optparserimpr", usage="Optimized client info parser w/o copy")
+    private boolean optImprClientParser = false;
+
     private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
         if (args.length < 1) {
@@ -79,18 +91,7 @@ public class PerfTest {
         }
     }
 
-    public static void main(final String args[]) {
-        final PerfTest inst = new PerfTest();
-        if (!inst.parseArgs(args)) {
-            return;
-        }
-
-        boolean useCache = inst.useCache;
-        String[] patterns = inst.readInputLines(inst.inputPatternFile);
-        String[] values = inst.readInputLines(inst.inputStringFile);
-        assert (patterns != null);
-        assert (values != null);
-
+    public static void nvlOps(PerfTest inst, boolean useCache, String[] patterns, String[] values) {
         if (inst.onlyJDK && inst.onlyRe2j && inst.onlyFast) {
             System.out.println("onlyJDK, onlyRe2j and onlyFast are exclusive, you cannot run them together");
             System.exit(1);
@@ -137,6 +138,53 @@ public class PerfTest {
             fast.setRepeated(useCache ? 10 : 1);
             MultipleThreadingSoj fastSoj = new MultipleThreadingSoj(inst.threads, fast);
             fastSoj.RunAll();
+        }
+    }
+
+    public static void clientInfoParser(PerfTest inst, boolean useCache, String[] patterns, String[] values) {
+        if (inst.originClientParser) {
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new OrigClientInfoParser(), patterns, values, inst.iterations));
+            mtsJdk.RunAll();
+        } else if (inst.optClientParser) {
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(new OptClientInfoParser(), patterns, values, inst.iterations));
+            mtsJdk.RunAll();
+        } else if (inst.optImprClientParser) {
+            OptClientInfoParser opt = new OptClientInfoParser();
+            opt.useSearchFromIndex(true);
+            MultipleThreadingSoj mtsJdk = new MultipleThreadingSoj(inst.threads,
+                    new SojNvlPerf(opt, patterns, values, inst.iterations));
+            mtsJdk.RunAll();
+        }
+        if (inst.compareResult) {
+            ClientInfoParserValidator v = new ClientInfoParserValidator(patterns, values);
+            if (v.compareResults()) {
+                System.out.println("Results are equal for three SOJ implements: " +
+                        OrigClientInfoParser.class.getName() + " " +
+                        OptClientInfoParser.class.getName() + " " +
+                        OptClientInfoParser.class.getName() + "Impr");
+            } else {
+                System.out.println("Not equal");
+            }
+        }
+    }
+    public static void main(final String args[]) {
+        final PerfTest inst = new PerfTest();
+        if (!inst.parseArgs(args)) {
+            return;
+        }
+
+        boolean useCache = inst.useCache;
+        String[] patterns = inst.readInputLines(inst.inputPatternFile);
+        String[] values = inst.readInputLines(inst.inputStringFile);
+        assert (patterns != null);
+        assert (values != null);
+
+        if (inst.nvl) {
+            nvlOps(inst, useCache, patterns, values);
+        } else {
+            clientInfoParser(inst, useCache, patterns, values);
         }
     }
 }

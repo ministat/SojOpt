@@ -1,0 +1,16 @@
+ForwardedFor
+RemoteIP
+Referer
+ContentLength
+Script
+Server
+Agent
+Encoding
+TPool
+TStamp
+TType
+TName
+TStatus
+TDuration
+TPayload
+TMachine
