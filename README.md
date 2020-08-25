@@ -92,7 +92,7 @@ Improvement is about 4.7X
 
 
 ## Run
-
+```
 hongjizhang@hongjizhang-desktop:~/Work/OpenSource/SojOpt$ java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -s data/soj_parse_clientinfo_10k.txt -p data/soj_parse_clientinfo.pat -g
 org.example.OrigClientInfoParser warm up takes 1572 (ms)
 org.example.OrigClientInfoParser warm up takes 1572 (ms)
@@ -132,4 +132,4 @@ org.example.OptClientInfoParser warm up takes 635 (ms)
 	3thd throughput: 6.94166E8 bytes/s
 Overall throughput: 7.12955E8 bytes/s
 Overall duration: 1367(ms) total strings 974609920 bytes
-
+```
