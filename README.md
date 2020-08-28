@@ -3,6 +3,7 @@ This repo demonstrates the optimization of some soj udf:
 
 ```SojNvl```
 ```soj_parse_clientinfo```
+```is_decimal```
 
 # Benchmark result
 
@@ -132,4 +133,45 @@ org.example.OptClientInfoParser warm up takes 635 (ms)
 	3thd throughput: 6.94166E8 bytes/s
 Overall throughput: 7.12955E8 bytes/s
 Overall duration: 1367(ms) total strings 974609920 bytes
+```
+
+# is_decimal
+
+Improvement is about 4.45X
+
+|ThroughPut(MB/s)|10k|
+|----------------|--|
+|JDK regex       |1.54753E8|
+|commons.lang3.isNumeric   |6.94242E8|
+
+## Run
+
+```
+java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -n 3 -pr 18 -sc 0 -s data/isDecimal_test1.txt -i 10000 -onum
+org.example.OrigIsDecimal warm up takes 91 (ms)
+org.example.OrigIsDecimal warm up takes 92 (ms)
+org.example.OrigIsDecimal warm up takes 91 (ms)
+org.example.OrigIsDecimal warm up takes 95 (ms)
+
+========Printing the results of org.example.OrigIsDecimal@723279cf ======
+	0thd throughput: 1.57128E8 bytes/s
+	1thd throughput: 1.57279E8 bytes/s
+	2thd throughput: 1.526E8 bytes/s
+	3thd throughput: 1.52155E8 bytes/s
+Overall throughput: 1.54753E8 bytes/s
+Overall duration: 16971(ms) total strings 2626320000 bytes
+
+java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -n 3 -pr 18 -sc 0 -s data/isDecimal_test1.txt -i 10000 -fnum
+org.example.FastIsDecimal warm up takes 49 (ms)
+org.example.FastIsDecimal warm up takes 49 (ms)
+org.example.FastIsDecimal warm up takes 49 (ms)
+org.example.FastIsDecimal warm up takes 49 (ms)
+
+========Printing the results of org.example.FastIsDecimal@723279cf ======
+	0thd throughput: 7.06064E8 bytes/s
+	1thd throughput: 6.84713E8 bytes/s
+	2thd throughput: 6.93389E8 bytes/s
+	3thd throughput: 6.93136E8 bytes/s
+Overall throughput: 6.94242E8 bytes/s
+Overall duration: 3783(ms) total strings 2626320000 bytes
 ```

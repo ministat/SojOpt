@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class MultipleThreadingSoj {
+public class MultipleThreadingIsNumerical {
     private int _threadNo = 4;
-    private SojNvlPerf _sojNvlPerf;
+    private VerifyNumPerf _sojNvlPerf;
 
-    public MultipleThreadingSoj(int thd, SojNvlPerf sojNvlPerf) {
+    public MultipleThreadingIsNumerical(int thd, VerifyNumPerf sojNvlPerf) {
         _threadNo = thd;
         _sojNvlPerf = sojNvlPerf;
     }
@@ -25,12 +25,12 @@ public class MultipleThreadingSoj {
     public void RunAll() {
         ExecutorService executor = (ExecutorService) Executors.newFixedThreadPool(_threadNo);
 
-        List<Task> taskList = new ArrayList<>();
+        List<Task2> taskList = new ArrayList<>();
         int startIndex = 0;
         for (int i = 0; i < _threadNo; i++) {
             int end = rangeLength(_sojNvlPerf.totalEntries(), _threadNo, i);
             assert (end >= 1);
-            Task task = new Task(_sojNvlPerf, startIndex, end-1);
+            Task2 task = new Task2(_sojNvlPerf, startIndex, end-1);
             taskList.add(task);
         }
 
@@ -66,13 +66,13 @@ public class MultipleThreadingSoj {
     }
 }
 
-class Task implements Callable<IResult> {
+class Task2 implements Callable<IResult> {
 
-    private SojNvlPerf _sojNvlPerf;
+    private VerifyNumPerf _sojNvlPerf;
     private int _start;
     private int _end;
 
-    public Task(SojNvlPerf sojNvlPerf, int s, int e) {
+    public Task2(VerifyNumPerf sojNvlPerf, int s, int e) {
         _sojNvlPerf = sojNvlPerf;
         _start = s;
         _end =e;
@@ -89,7 +89,3 @@ class Task implements Callable<IResult> {
         return r;
     }
 }
-
-
-
-

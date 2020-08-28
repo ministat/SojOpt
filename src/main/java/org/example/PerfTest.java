@@ -12,7 +12,7 @@ public class PerfTest {
     @Option(name="-s", aliases="--strFile", required=true, usage="Specify the input string file, every input string is in every single line.")
     private String inputStringFile;
 
-    @Option(name="-p", aliases="--patFile", required=true, usage="Specify the pattern string file, each pattern is in every single line.")
+    @Option(name="-p", aliases="--patFile", usage="Specify the pattern string file, each pattern is in every single line.")
     private String inputPatternFile;
 
     @Option(name="-i", aliases="--iterations", usage="Specify the iterations. Default is 10")
@@ -39,8 +39,17 @@ public class PerfTest {
     @Option(name="-a", aliases="--usecache", usage="Use cache to accelerate process")
     private boolean useCache = false;
 
-    @Option(name="-n", aliases="--nvl", usage="Nvl operations")
-    private boolean nvl = false;
+    @Option(name="-e", aliases="--extractvalue", usage="Extract value through nvl")
+    private boolean extractValue = false;
+
+    @Option(name="-onum", aliases="--originisnum", usage="Only run origin isNumerical")
+    private boolean originIsNum = false;
+
+    @Option(name="-fnum", aliases="--fastisnum", usage="Only run fast isNumerical")
+    private boolean fastIsNum = false;
+
+    @Option(name="-n", aliases="--sojtype", usage="nvl: 1, clientparser: 2, isdecimal: 3, isint: 4, isbigint: 5")
+    private int nvl = 2;
 
     @Option(name="-g", aliases="--origparser", usage="Original client info parser")
     private boolean originClientParser = false;
@@ -50,6 +59,12 @@ public class PerfTest {
 
     @Option(name="-x", aliases="--optparserimpr", usage="Optimized client info parser w/o copy")
     private boolean optImprClientParser = false;
+
+    @Option(name="-pr", aliases="--precision", usage="Specify the precision for isDecimal, default is 18")
+    private int precision = 18;
+
+    @Option(name="-sc", aliases="--scale", usage="Specify the scale for isDecimal, default is 0")
+    private int scale = 0;
 
     private boolean parseArgs(final String[] args) {
         final CmdLineParser parser = new CmdLineParser(this);
@@ -95,6 +110,23 @@ public class PerfTest {
         if (inst.onlyJDK && inst.onlyRe2j && inst.onlyFast) {
             System.out.println("onlyJDK, onlyRe2j and onlyFast are exclusive, you cannot run them together");
             System.exit(1);
+        }
+        if (inst.extractValue) {
+            FastSojNvlImpl fast = new FastSojNvlImpl(false);
+            StringBuilder sb = new StringBuilder();
+            for (String p : patterns) {
+                for (String v : values) {
+                    String result = fast.getTagValue(v, p);
+                    if (result != null) {
+                        if (sb.length() > 0) {
+                            sb.append('\n');
+                        }
+                        sb.append(result);
+                    }
+                }
+            }
+            System.out.println(sb.toString());
+            return;
         }
         if (inst.compareResult) {
             Validate v = new Validate(patterns, values);
@@ -169,22 +201,68 @@ public class PerfTest {
             }
         }
     }
+
+    public static void isnumerical(PerfTest inst, String[] values) {
+        if (inst.compareResult) {
+            IsNumericalValidator v = new IsNumericalValidator(values, inst.precision, inst.scale);
+            if (v.compareResults()) {
+                System.out.println("Results are equal for " +
+                        OrigIsDecimal.class.getName() + " and " +
+                        FastIsDecimal.class.getName());
+            } else {
+                System.out.println("Not equal");
+            }
+            return;
+        }
+        if (inst.originIsNum) {
+            if (inst.precision > 0) {
+                OrigIsDecimal orig = new OrigIsDecimal(inst.precision, inst.scale);
+                MultipleThreadingIsNumerical ot =
+                        new MultipleThreadingIsNumerical(inst.threads, new VerifyNumPerf(orig, values, inst.iterations));
+                ot.RunAll();
+            }
+        } else if (inst.fastIsNum) {
+            if (inst.precision > 0) {
+                FastIsDecimal fast = new FastIsDecimal(inst.precision, inst.scale);
+                MultipleThreadingIsNumerical ot =
+                        new MultipleThreadingIsNumerical(inst.threads, new VerifyNumPerf(fast, values, inst.iterations));
+                ot.RunAll();
+            }
+        }
+    }
     public static void main(final String args[]) {
         final PerfTest inst = new PerfTest();
         if (!inst.parseArgs(args)) {
             return;
         }
-
         boolean useCache = inst.useCache;
-        String[] patterns = inst.readInputLines(inst.inputPatternFile);
-        String[] values = inst.readInputLines(inst.inputStringFile);
-        assert (patterns != null);
-        assert (values != null);
+        String[] patterns = null;
+        String[] values = null;
 
-        if (inst.nvl) {
-            nvlOps(inst, useCache, patterns, values);
-        } else {
-            clientInfoParser(inst, useCache, patterns, values);
+        switch (inst.nvl) {
+            case 1:
+                patterns = inst.readInputLines(inst.inputPatternFile);
+                values = inst.readInputLines(inst.inputStringFile);
+                assert (patterns != null);
+                assert (values != null);
+                nvlOps(inst, useCache, patterns, values);
+                break;
+            case 2:
+                patterns = inst.readInputLines(inst.inputPatternFile);
+                values = inst.readInputLines(inst.inputStringFile);
+                assert (patterns != null);
+                assert (values != null);
+                clientInfoParser(inst, useCache, patterns, values);
+                break;
+            case 3:
+                values = inst.readInputLines(inst.inputStringFile);
+                assert (values != null);
+                isnumerical(inst, values);
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
         }
     }
 }
