@@ -1,7 +1,5 @@
 package org.example;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import java.math.BigDecimal;
 
 public class OrigIsDecimal implements IsNumerical {

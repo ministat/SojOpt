@@ -206,28 +206,41 @@ public class PerfTest {
         if (inst.compareResult) {
             IsNumericalValidator v = new IsNumericalValidator(values, inst.precision, inst.scale);
             if (v.compareResults()) {
-                System.out.println("Results are equal for " +
-                        OrigIsDecimal.class.getName() + " and " +
-                        FastIsDecimal.class.getName());
+                if (inst.precision > 0 && inst.scale >= 0) {
+                    System.out.println("Results are equal for " +
+                            OrigIsDecimal.class.getName() + " and " +
+                            FastIsDecimal.class.getName());
+                } else {
+                    System.out.println("Results are equal for " +
+                            OrigIsInteger.class.getName() + " and " +
+                            FastIsInteger.class.getName());
+                }
+
             } else {
                 System.out.println("Not equal");
             }
             return;
         }
         if (inst.originIsNum) {
+            IsNumerical orig = null;
             if (inst.precision > 0) {
-                OrigIsDecimal orig = new OrigIsDecimal(inst.precision, inst.scale);
-                MultipleThreadingIsNumerical ot =
-                        new MultipleThreadingIsNumerical(inst.threads, new VerifyNumPerf(orig, values, inst.iterations));
-                ot.RunAll();
+                orig = new OrigIsDecimal(inst.precision, inst.scale);
+            } else {
+                orig = new OrigIsInteger();
             }
+            MultipleThreadingIsNumerical ot =
+                    new MultipleThreadingIsNumerical(inst.threads, new VerifyNumPerf(orig, values, inst.iterations));
+            ot.RunAll();
         } else if (inst.fastIsNum) {
+            IsNumerical fast = null;
             if (inst.precision > 0) {
-                FastIsDecimal fast = new FastIsDecimal(inst.precision, inst.scale);
-                MultipleThreadingIsNumerical ot =
-                        new MultipleThreadingIsNumerical(inst.threads, new VerifyNumPerf(fast, values, inst.iterations));
-                ot.RunAll();
+                fast = new FastIsDecimal(inst.precision, inst.scale);
+            } else {
+                fast = new FastIsInteger();
             }
+            MultipleThreadingIsNumerical ot =
+                    new MultipleThreadingIsNumerical(inst.threads, new VerifyNumPerf(fast, values, inst.iterations));
+            ot.RunAll();
         }
     }
     public static void main(final String args[]) {
@@ -255,11 +268,10 @@ public class PerfTest {
                 clientInfoParser(inst, useCache, patterns, values);
                 break;
             case 3:
+            case 4:
                 values = inst.readInputLines(inst.inputStringFile);
                 assert (values != null);
                 isnumerical(inst, values);
-                break;
-            case 4:
                 break;
             case 5:
                 break;

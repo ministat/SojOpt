@@ -9,6 +9,9 @@ public class IsNumericalValidator extends PerfResource {
         if (precision > 0 && scale >= 0) {
             _origin = new OrigIsDecimal(precision, scale);
             _opt = new FastIsDecimal(precision, scale);
+        } else {
+            _origin = new OrigIsInteger();
+            _opt = new FastIsInteger();
         }
     }
 
