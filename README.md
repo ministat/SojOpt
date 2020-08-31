@@ -137,12 +137,14 @@ Overall duration: 1367(ms) total strings 974609920 bytes
 
 # is_decimal
 
-Improvement is about 4.45X
+Improvement is about 4.45X~6X
 
-|ThroughPut(MB/s)|10k|
-|----------------|--|
-|JDK regex       |1.54753E8|
-|commons.lang3.isNumeric   |6.94242E8|
+1k input data
+
+|ThroughPut(MB/s)|4 threads|8 threads|
+|----------------|--|--|
+|JDK regex       |1.54753E8|8.8667E7|
+|commons.lang3.isNumeric   |6.94242E8|5.67413E8|
 
 ## Run
 
@@ -174,4 +176,48 @@ org.example.FastIsDecimal warm up takes 49 (ms)
 	3thd throughput: 6.93136E8 bytes/s
 Overall throughput: 6.94242E8 bytes/s
 Overall duration: 3783(ms) total strings 2626320000 bytes
+
+java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -n 4 -i 100000 -t 8 -s data/isDecimal_test2.txt -onum
+org.example.OrigIsDecimal warm up takes 99 (ms)
+org.example.OrigIsDecimal warm up takes 101 (ms)
+org.example.OrigIsDecimal warm up takes 100 (ms)
+org.example.OrigIsDecimal warm up takes 100 (ms)
+org.example.OrigIsDecimal warm up takes 101 (ms)
+org.example.OrigIsDecimal warm up takes 101 (ms)
+org.example.OrigIsDecimal warm up takes 100 (ms)
+org.example.OrigIsDecimal warm up takes 101 (ms)
+
+========Printing the results of org.example.OrigIsDecimal@2f4d3709 ======
+	0thd throughput: 8.9946E7 bytes/s
+	1thd throughput: 8.8612E7 bytes/s
+	2thd throughput: 8.9164E7 bytes/s
+	3thd throughput: 8.8836E7 bytes/s
+	4thd throughput: 8.972E7 bytes/s
+	5thd throughput: 8.9318E7 bytes/s
+	6thd throughput: 8.9115E7 bytes/s
+	7thd throughput: 9.0362E7 bytes/s
+Overall throughput: 8.9381E7 bytes/s
+Overall duration: 213942(ms) total strings 19122400000 bytes
+
+java -jar target/SojUdfPerf-1.0-SNAPSHOT-jar-with-dependencies.jar -n 4 -i 100000 -t 8 -s data/isDecimal_test2.txt -fnum
+org.example.FastIsDecimal warm up takes 41 (ms)
+org.example.FastIsDecimal warm up takes 43 (ms)
+org.example.FastIsDecimal warm up takes 43 (ms)
+org.example.FastIsDecimal warm up takes 42 (ms)
+org.example.FastIsDecimal warm up takes 41 (ms)
+org.example.FastIsDecimal warm up takes 41 (ms)
+org.example.FastIsDecimal warm up takes 42 (ms)
+org.example.FastIsDecimal warm up takes 42 (ms)
+
+========Printing the results of org.example.FastIsDecimal@2f4d3709 ======
+	0thd throughput: 5.59466E8 bytes/s
+	1thd throughput: 5.61042E8 bytes/s
+	2thd throughput: 5.39517E8 bytes/s
+	3thd throughput: 5.0994E8 bytes/s
+	4thd throughput: 5.08313E8 bytes/s
+	5thd throughput: 5.07881E8 bytes/s
+	6thd throughput: 5.63289E8 bytes/s
+	7thd throughput: 5.12159E8 bytes/s
+Overall throughput: 5.3162E8 bytes/s
+Overall duration: 35970(ms) total strings 19122400000 bytes
 ```

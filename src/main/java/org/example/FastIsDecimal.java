@@ -20,7 +20,7 @@ public class FastIsDecimal implements IsNumerical {
             return false;
         }
 
-        if (!NumberUtils.isNumber(value)) {
+        if (!NumberUtils.isNumber(value) || value.contains("e") || value.contains("E")) {
             return false;
         }
         try {
